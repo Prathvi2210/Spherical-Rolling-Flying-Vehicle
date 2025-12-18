@@ -1,0 +1,34 @@
+This file is for instructions to install the synexens ROS driver in RPi.
+First download the .tar.xz file provided by synexens for your product, if using headless without GUI: download it on windows and copy to rpi in the terminal:
+>>> scp /path/to/your/file pi@<raspberry_pi_ip>:/home/pi/   
+
+Then extract the archive:
+>>> tar -xf synexens_cs20_driver.tar.xz
+This will create a folder (likely named something like synexens_ros_driver or similar).
+
+Move it to your ROS workspace
+>>> mv synexens_ros_driver ~/catkin_ws/src/
+This command is assuming you have a ROS Noetic Workspace
+
+Navigate to the workspace
+>>> cd ~/catkin_ws
+Install any required dependencies
+>>> rosdep install --from-paths src --ignore-src -r -y
+If rosdep gives any error about missing packages, install them manually using apt
+
+Now compile the workspace (Build the packages)
+>>> catkin_make
+
+Source the workspace
+>>> source devel/setup.bash
+for permanent sourcing add it to your .bashrc
+>>> echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+Launch:
+>>> roslaunch synexens_ros_driver cs20.launch
+
+After launching, check if data is being published
+in another terminal >>> rostopic list 
+If you have GUI environment, you can visualize it in RVIZ
+>>> rosrun rviz rviz
+Add displays (e.g. PointCloud2) in rviz to see the topic data
