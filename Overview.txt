@@ -85,3 +85,10 @@ Several other SLAM algorithms can build 3D maps using only depth images or point
  LiDAR SLAM Options (Point Cloud)
 
 For real time mapping on UAVs, DDS and LiDar based both are not recommended. From the remaining, they both are not able to run on an RPi system, need more power. Atleast cartographer can be started on an RPi with 'aggressive tuning' but again it will not be robust. Need to have a more powerful edge computer for this.
+
+CS20 is a forward‑looking ToF depth camera: 640×480, ~70–90° FOV, 0.1–5 m range, giving a dense pointcloud in a single sector
+Classic LiDAR SLAM (LOAM, LeGO-LOAM, many 2D mappers) assume:
+ 360° or at least wide horizontal coverage.
+ Fixed vertical beam layout (e.g., 16/32/64 rings).
+ Clear ground plane for segmentation and motion constraints.
+Then only solution is to use 2D mapping to accomodate this on RPi
