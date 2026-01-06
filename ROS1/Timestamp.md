@@ -106,20 +106,66 @@ nano src/SYRosDevice.cpp
 m_depthCameraInfo.header.stamp = ros::Time::now();
 m_irCameraInfo.header.stamp    = ros::Time::now();
 ```
-For example, my code after the editing becomes:
+For example, my code had m_depthCameraInfo.header.stamp not set so it was defaulting to zero
+So the error was: depth image is fine, CameraInfo messages should copy the timestamp from image. RGB feed also needs a non-empty header
+after the editing it becomes:
 ```bash
-// Before publishing depth info
-m_depthCameraInfo.header.stamp = ros::Time::now();
+// Fix for depth CameraInfo
+m_calibrationData.getDepthCameraInfo(m_depthCameraInfo, &intrinsics);
+m_depthCameraInfo.header.stamp = depthImage->header.stamp;   // match image timestamp
+m_depthCameraInfo.header.frame_id = depthImage->header.frame_id;
 m_mapRosPublisher[nDeviceID][DEPTH].publish(m_depthCameraInfo);
 
-// Before publishing IR info
-m_irCameraInfo.header.stamp = ros::Time::now();
-m_mapRosPublisher[nDeviceID][IR].publish(m_irCameraInfo);
+// Fix for RGB image
+std_msgs::Header rgb_header;
+rgb_header.stamp = ros::Time::now();  // or capture_time if available
+rgb_header.frame_id = "rgb_camera_link";
+
+sensor_msgs::ImagePtr rgbImage = cv_bridge::CvImage(
+    rgb_header,
+    sensor_msgs::image_encodings::BGR8,
+    bgrImgRGB
+).toImageMsg();
+m_mapImagePublisher[nDeviceID][RGB].publish(rgbImage);
 ```
 After editing rebuild the packages in the workspace
+Ensure the synexens_ros1 package is in the catkin_ws/src
+synexens_ros1 is just the package source, not a full catkin workspace
 ```bash
 cd ~/synexens_ros1
 catkin_make
 source devel/setup.bash
 ```
 and check for timestamps
+
+If above soultion is not working the edited driver is not in the ROS_PACKAGE_PATH. ROS maybe still picking up the old installed package from the system ROS_PACKAGE_PATH
+Solution 1: Build the driver in a workspace and add it to ROS_PACKAGE_PATH
+```bash
+echo $ROS_PACKAGE_PATH
+```
+should give an output consisting of the catkin_ws, for ex:
+```bash
+/home/srfv/synexens_ros1/src:/home/srfv/catkin_ws/src:/opt/ros/noetic/share
+```
+Solution 2: Copy your edited driver into ~/catkin_ws/src
+copy, clean, rebuild (catkin_make), source
+
+If still not working, the error maybe in time capturing.
+In the driver.cpp file
+```bash
+depthImage->header.stamp = capture_time;
+```
+Here if the capture_time is zero all messages have stamp: 0
+So we need to initialize the capture_time
+In the code you can see something like:
+```bash
+ros::Time capture_time = ros::Time::now();
+```
+This is where capture_time is assigned
+If this is what you see, edit the previous line as follows:
+```bash
+depthImage->header.stamp = capture_time;
+# changes to
+depthImage->header.stamp = ros::Time::now();
+```
+Same goes for RGB image
