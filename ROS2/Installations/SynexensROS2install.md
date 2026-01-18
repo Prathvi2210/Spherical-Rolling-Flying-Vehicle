@@ -14,7 +14,7 @@ Download the arm SDK separately, get latest version: SynexensSDK_4.2.4.0_armv8.t
 Extract the SDK"
 ```bash
 cd ~/Downloads
-tar -xvf SynexensSDK_4.2.4.0_armv8.tar
+tar -xvf SynexensSDK_4.2.4.0_armv8.tar.xz
 ```
 Prepare the ROS workspace
 ```bash
@@ -23,7 +23,8 @@ cd ~/ros2_ws/src
 ```
 Download the ROS demo compressed file here and then extract it
 ```bash
-tar -xvf synexens_ros2.tar.gz
+tar -xvf synexens_ros2.tar.xz
+# first it was gz
 ```
 NOTE: The downloaded SDK should be compatible with the ROS demo, mentioned in its description on the website.
 The replacement target files are at synexens_ros2/ext/sdk/
