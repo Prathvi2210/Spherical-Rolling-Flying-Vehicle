@@ -1,5 +1,8 @@
 Many mistakes happen when installing the SDK and ROS wrapper for Intel Realsense. 
 In my case it was a version mismatch, the SDk and ROS wrapper both contain their own version of librealsense.
+My specific error started when I installed 'ros-humble-librealsense2' while I already had a source built librealsense with USB access on jetson.
+This specific action created two competing owners of the same hardware stack causing camera not being recognized in the realsense-viewer and many other errors such as the 'bad optionaal access'
+ros-humble-realsense2 installs librealsense binaries with its own udev rules, own HID expectations and is not built for jetson-specific behaviour.
 This causes confusion in the system often requiring clean slate to proceed again with different approach.
 Cleaning the system is especially hard for source build which are mostly the case in version mismatch cases.
 This set of instructions is to delete all traces on intel software from the device and go back to a system with just ROS installed:
@@ -76,3 +79,7 @@ rs-enumerate-devices
 Expected: no output for all and enumerate command not found
 
 Phase 5-Reboot
+
+To avoid similar problems in reinstallation stick to only one path:
+1) ROS binaries only- No source build, no custom udev rules
+2) Source build only(recommended)- Build librealsense from source then build ROS wrapper from source. NEVER install ros-humble-librealsense2
