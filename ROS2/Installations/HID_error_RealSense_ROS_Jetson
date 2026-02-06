@@ -1,0 +1,29 @@
+Even after correct installations the realsense ROS launch for Realsense camera may fail with IMU functionality
+The error is of the form:ros2 launch realsense2_camera rs_launch.py
+>>>[INFO] [launch]:Default logging verbosity is set to INFO 
+[INFO] [launch.user]: 🚀 Launching as Normal ROS Node 
+[INFO] [realsense2_camera_node-1]: process started with pid [34860] 
+[realsense2_camera_node-1] [INFO] 
+[1768738381.523154451] [camera.camera]: RealSense ROS v4.56.4 
+[realsense2_camera_node-1] [INFO] 
+[1768738381.523654200] [camera.camera]: Built with LibRealSense v2.56.4 
+[realsense2_camera_node-1]  [INFO] 
+[1768738381.523739704] [camera.camera]: Running with LibRealSense v2.56.4 
+[realsense2_camera_node-1] 18/01 17:43:01,582 WARNING [281472505985248] (ds-motion-common.cpp:452) No HID info provided, IMU is disabled 
+[realsense2_camera_node-1] 18/01 17:43:01,585 ERROR [281472505985248] (rs.cpp:256) [rs2_create_device( info_list:0xffff480271b0, index:0 ) UNKNOWN] bad optional access 
+[realsense2_camera_node-1] 18/01 17:43:01,585 ERROR [281472505985248] (rs.cpp:256) [rs2_delete_device( device:nullptr ) UNKNOWN] null pointer passed for argument "device" 
+[realsense2_camera_node-1] 18/01 17:43:01,585 WARNING [281472505985248] (rs.cpp:392) null pointer passed for argument "device" 
+[realsense2_camera_node-1] [WARN] [1768738381.585297414] [camera.camera]: Device 1/1 failed with exception: bad optional access 
+[realsense2_camera_node-1] [ERROR] [1768738381.585605897] [camera.camera]: The requested device with is NOT found. Will Try again. 
+
+[realsense2_camera_node-1] 18/01 17:43:07,873 WARNING [281472505985248] (ds-motion-common.cpp:452) No HID info provided, IMU is disabled 
+[realsense2_camera_node-1] 18/01 17:43:07,874 ERROR [281472505985248] (rs.cpp:256) [rs2_create_device( info_list:0xffff48025b40, index:0 ) UNKNOWN] bad optional access 
+[realsense2_camera_node-1] 18/01 17:43:07,874 ERROR [281472505985248] (rs.cpp:256) [rs2_delete_device( device:nullptr ) UNKNOWN] null pointer passed for argument "device" 
+[realsense2_camera_node-1] 18/01 17:43:07,874 WARNING [281472505985248] (rs.cpp:392) null pointer passed for argument "device" 
+[realsense2_camera_node-1] [WARN] [1768738387.874646571] [camera.camera]: Device 1/1 failed with exception: bad optional access 
+[realsense2_camera_node-1] [ERROR] [1768738387.874881741] [camera.camera]: The requested device with is NOT found. Will Try again. 
+
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT) 
+[realsense2_camera_node-1] [INFO] 
+[1768738409.413367474] [rclcpp]: signal_handler(SIGINT/SIGTERM) 
+[INFO] [realsense2_camera_node-1]: process has finished cleanly [pid 34860]
