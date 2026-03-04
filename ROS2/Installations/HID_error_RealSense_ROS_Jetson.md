@@ -32,7 +32,6 @@ ros2 launch realsense2_camera rs_launch.py
 ```
 Key inference from this is that now librealsense can see the camera, but ROS is failing when it tries to access the IMU(HID interfaces)
 i.e the permissions for HID devices are not handed to ROS
-
 If you dont want to use the IMU, temporary workaround is available:
 ```bash
 ros2 launch realsense2_camera rs_launch.py enable_gyro:=false enable_accel:=false
@@ -86,4 +85,7 @@ relogin
    ```bash
    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="8086", MODE="0666"
    ```
-   Save and reload the rules and replug the camera
+   Save and reload the rules and replug the camera and check the /dev/hidraw* directory
+If this doesnt work that indicates the realsense device is enumerating as a pertial composite USB device(One HID interface comes up, mandatory HID interfaces never enumerate correctly).
+librealsense cannot create a logical device hence bad optional access. Failure found below software level (tegra-xusb)
+Try hardware reset through realsense viewer and cold power drain of the camera
