@@ -1,4 +1,4 @@
-The documentation for installation of Intel Realsense SDK which is the first step in integrating the intel deoth sensors with ros, is confusing.
+The documentation for installation of Intel Realsense SDK which is the first step in integrating the intel depth sensors with ros, is confusing.
 Here is a concise overview and solution
 
 There are two steps to be followed for connecting an intel depth camera with ROS:
