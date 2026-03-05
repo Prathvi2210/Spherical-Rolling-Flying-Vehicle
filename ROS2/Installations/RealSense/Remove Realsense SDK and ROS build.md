@@ -7,7 +7,7 @@ This causes confusion in the system often requiring clean slate to proceed again
 Cleaning the system is especially hard for source build which are mostly the case in version mismatch errors.
 This set of instructions is to delete all traces on intel software from the device and go back to a system with just ROS installed:
 
-Phase 1- Remove ROS realsense wrapper completely
+Phase 1- Remove ROS realsense wrapper completely and all wource workspaces
 ```bash
 cd ~/ros2_ws/src
 rm -rf realsense-ros
@@ -29,7 +29,9 @@ remove it
 ```bash
 sudo apt purge ros-humble-realsense2-camera -y
 sudo apt purge ros-humble-realsense2 -y
+sudo apt purge ros-humble-librealsense2 -y
 sudo apt autoremove -y
+sudo apt autoclean
 ```
 In the case if any packages have been held for version pinning, normal apt purge -y is not allowed
 First check the held packages
@@ -54,7 +56,7 @@ Update linker cache
 ```
 sudo Idconfig
 ```
-Remove librealsense source tree (optional)
+Remove librealsense source tree 
 ```bash
 rm -rf ~/librealsense
 ```
@@ -67,7 +69,11 @@ Reload udev
 sudo udevadm control --reload rules
 sudo udevadm trigger
 ```
-
+Remove ROSDEP overrides
+Previously added to block librealsense
+```bash
+rm -rf ~/.ros/rosdep
+```
 Phase 4- Clean User environment
 Reset shell environment completely
 Close the terminal or run:
@@ -83,6 +89,9 @@ Verify environment is clean
 ```bash
 ros2 pkg list | grep realsense
 apt list --installed | grep realsense
+ls ~/ | grep -E "ros2_ws|librealsense"
+
+echo $AMENT_PREFIX_PATH | grep realsense
 
 which realsense-viewer
 
@@ -90,6 +99,12 @@ rs-enumerate-devices
 ```
 Expected: no output for all and enumerate command not found
 
+Any output for $AMENT_PREFIX_PATH means the current shell session still has the ~/ros2_ws/install/.... injected, maybe from previous source install/setup.bash
+This environment variable remains even after the directories have been cleaned and ROS will think they exist. Solution- Hard reset the shell environment
+```bash
+exec bash --noprofile --norc
+```
+This starts a clean bash with zero inherited ROS variables. Source only ROS2 humble and check the $AMENT_PREFIX_PATH
 Phase 5-Reboot
 
 To avoid similar problems in reinstallation stick to only one path:
