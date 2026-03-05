@@ -41,7 +41,7 @@ But that stops here, Jetson boards use custom kernels 'tegra' and patching kerne
 Here we skip that step and move to build
 ```bash
 mkdir build && cd build
-cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA=true -DFORCE_LIBUVC=true
+cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA=true -DFORCE_LIBUVC=true -DBUILD_PYTHON_BINDINGS=true 
 
 make -j$(nproc)
 sudo make install
