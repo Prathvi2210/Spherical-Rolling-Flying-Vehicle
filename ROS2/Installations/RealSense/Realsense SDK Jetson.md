@@ -30,7 +30,10 @@ git clone https://github.com/realsenseai/librealsense.git
 
 #Run Realsense permissions script from librealsense2 root directory:
 cd librealsense
-./scripts/setup_udev_rules.sh
+git checkout v2.56.4
+#Apply kernel patches
+sudo ./scripts/setup_udev_rules.sh
+sudo ./scripts/patch-realsense-ubuntu-L4T.sh
 ```
 
 Till this point the commands were general and working on Ubuntu kernels. 
@@ -38,12 +41,17 @@ But that stops here, Jetson boards use custom kernels 'tegra' and patching kerne
 Here we skip that step and move to build
 ```bash
 mkdir build && cd build
-cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA=true
+cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA=true -DFORCE_LIBUVC=true
 
 make -j$(nproc)
 sudo make install
+sudo Idconfig
 ```
 
+Verify:
+```bash
+realsense-viewer
+```
 In the provided documentation, -DBUILD_GRAPHICAL_EXAMPLES is not included also -DFORCE_RSUSB_BACKEND is set to false 
 But for visualization on the realsense-viewer it is needed because:
 It forces pure USB userspace backend
