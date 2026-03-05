@@ -20,7 +20,9 @@ rm -rf build install log
 Remove any binary installed ROS Realsense Package
 ```bash
 apt list --installed | grep realsense
+ls /opt/ros/humble/bin | grep realsense
 ```
+Must return nothing
 If output comes, something like
 ```bash
 ros-humble-realsense2-camera
@@ -51,6 +53,7 @@ sudo rm -rf /usr/local/lib/librealsense*
 sudo rm -rf /usr/local/include/librealsense2
 sudo rm -rf /usr/local/bin/realsense-*
 sudo rm -rf /usr/local/bin/rs-*
+sudo rm -rf /usr/local/bin/realsense-viewer
 ```
 Update linker cache
 ```
