@@ -304,7 +304,11 @@ Edit that file
 fov_deg: 70.0
 max_range: 8.0
 min_range: 0.2
-blind: 0.25
+
+lidar_type: 0
+scan_line: 1
+blind: 0.1
+feature_extract_enable: false 
 point_filter_num: 3
 
 lidar_topic: /camera1/points2
@@ -312,6 +316,7 @@ imu_topic: /camera1/imu
 
 extrinsic_est_en: false
 ```
+CS20 publishes intensity but FAST-LIO never uses it, not harmful but it spams the terminal with failed to read intensity messages. feature_extract_enable: false stops the sensor from publishing intensity.
 Launch
 terminal 1
 ```bash
