@@ -36,7 +36,7 @@ ros2 launch synexens_ros2 driver_launch.py
 Use viewer_launch.py if you want to open rviz for visualization.
 Confirm pointcloud topic
 ```bash
-ros2 topic echo /camera1/points2 --once
+ros2 topic echo /camera1_HV0121115C0352/points2 --once
 ```
 Minimal is 10-15 Hz
 3) FAST-LIO2 parameter sanity check: edit the FAST-LIO2 config (usually fastlio.yaml):
