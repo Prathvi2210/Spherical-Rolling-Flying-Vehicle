@@ -23,7 +23,7 @@ Set the IMU stream rate- In different terminal
 ros2 service call /mavros/set_stream_rate mavros_msgs/srv/StreamRate \
 "{stream_id: 0, message_rate: 200, on_off: true}"
 ```
-For IMU only, stream_id=6
+For IMU only, stream_id=6.
 Confirm IMU topic:
 ```bash
 ros2 topic echo /mavros/imu/data --once
@@ -31,8 +31,9 @@ ros2 topic echo /mavros/imu/data --once
 2) Synexens CS20
 Launch only pointcloud, depth feed not required for LIO, this reduces processing
 ```bash
-ros2 launch synexens_camera cs20.launch.py
+ros2 launch synexens_ros2 driver_launch.py
 ```
+Use viewer_launch.py if you want to open rviz for visualization.
 Confirm pointcloud topic
 ```bash
 ros2 topic echo /camera1/points2 --once
