@@ -12,11 +12,11 @@ source ~/ros2_ws/install/setup.bash
 
 1) Pixhak + Mavros2
 ```bash
-ros2 launch mavros apm.launch.py \
-fcu_url:=/dev/ttyUSB0:921600 \
-gcs_url:=udp://@ \
-target_system_id:=1 \
-target_component_id:=1
+ros2 run mavros mavros_node --ros-args \
+-p fcu_url:=/dev/ttyACM0:57600 \
+-p target_system:=1 \
+-p target_component:=1 \
+-p config_file:=/opt/ros/humble/share/mavros/launch/apm_config.yaml
 ```
 Set the IMU stream rate- In different terminal
 ```bash
