@@ -4,7 +4,7 @@ sudo apt install ros-humble-kiss-icp
 ```
 This wont work- Unable to locate package ros-humble-kiss-icp.
 
-Install KISS-ICP from source (for kiss-icp as a Python library):
+# Install KISS-ICP from source (for kiss-icp as a Python library):
 ```bash
 #Install dependencies first
 sudo apt install python3-pip python3-colcon-common-extensions -y
@@ -43,7 +43,7 @@ cd kiss-icp
 pip install .
 ```
 
-For KISS-ICP as ROS2 package(which is what I'll be using):
+# For KISS-ICP as ROS2 package(which is what I'll be using):
 Create workspace if not already
 ```bash
 cd ~/ros2_ws/src
