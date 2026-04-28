@@ -38,9 +38,9 @@ source install/setup.bash
 The launch command is (given is the full command for redundancy):
 ```bash
 ros2 launch kiss_icp odometry.launch.py \
-  topic:=/camera1_HV0121115C0352/points2 \
+  topic:=/camera1_HV0121115C0359/points2 \
   use_sim_time:=false \
-  visualize:=true \
+  visualize:=false \
   base_frame:=depth_camera_link \
   publish_odom_tf:=true \
   invert_odom_tf:=false \
