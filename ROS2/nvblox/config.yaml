@@ -1,0 +1,57 @@
+nvblox_node:
+  ros__parameters:
+    # ---- Frames ----
+    global_frame: "odom_lidar"          # KISS-ICP's odometry parent frame
+    pose_frame: "depth_camera_link" # Must exist in the TF
+    map_clearing_frame_id: "depth_camera_link" # Must exist in the TF
+    use_tf_transforms: true
+    use_topic_transforms: false
+
+     # ---- Visualization ----
+    esdf_slice_bounds_visualization_attachment_frame_id: "depth_camera_link"
+    workspace_height_bounds_visualization_attachment_frame_id: "depth_camera_link"
+
+    # ---- Mapping mode ----
+    mapping_type: "static_tsdf"
+
+    # ---- What sensors to use ----
+    use_depth: true
+    use_color: false
+    use_lidar: false
+    num_cameras: 1
+
+    # ---- Voxel resolution ----
+    # 5cm voxels: balance between sharpness and Orin Nano 8GB GPU memory.
+    voxel_size: 0.05
+
+    # ---- Processing rates (Hz) ----
+    # Depth bridges at ~12Hz, so set integration <= 12.
+    tick_period_ms: 10
+    integrate_depth_rate_hz: 10.0
+    update_mesh_rate_hz: 5.0
+    update_esdf_rate_hz: 5.0
+    publish_layer_pointcloud_rate_hz: 2.0
+    decay_tsdf_rate_hz: 0.0
+    clear_map_outside_radius_rate_hz: 1.0
+
+    # ---- ESDF settings (2D slice for nav2) ----
+    esdf_mode: "2d"                        # 0 = 3D ESDF, 1 = 2D slice
+    publish_esdf_distance_slice: true
+
+    # NVBLOX 3.2 nests these under static_mapper.* nested syntax below
+    static_mapper:
+        esdf_slice_min_height: 0.10
+        esdf_slice_max_height: 0.50
+        esdf_slice_height: 0.25
+        projective_integrator_max_integration_distance_m: 4.0
+
+    # ---- Map size management (Orin Nano 8GB headroom) ----
+    map_clearing_radius_m: 8.0
+
+    # ---- Diagnostics ----
+    print_rates_to_console: true
+    print_timings_to_console: false
+    print_statistics_on_console_period_ms: 10000
+
+    # ---- Input queue ----
+    maximum_sensor_message_queue_length: 30
