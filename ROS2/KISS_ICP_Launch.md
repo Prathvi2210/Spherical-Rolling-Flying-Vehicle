@@ -4,8 +4,8 @@ Contents:
 ```bash
 kiss_icp_node:
   ros__parameters:
-    base_frame: "camera_base"
-    lidar_odom_frame: "odom_lidar"
+    base_frame: "base_link" #changes after NVBLOX and EKF usage
+    lidar_odom_frame: "odom"
     publish_odom_tf: true
     invert_odom_tf: false
     position_covariance: 0.1
