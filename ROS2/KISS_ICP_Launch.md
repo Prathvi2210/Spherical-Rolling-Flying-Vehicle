@@ -41,7 +41,6 @@ ros2 launch kiss_icp odometry.launch.py \
   topic:=/camera1_HV0121115C0539/points2 \
   use_sim_time:=false \
   visualize:=false \
-  base_frame:=depth_camera_link \
   publish_odom_tf:=true \
   invert_odom_tf:=false \
   deskew:=false \
