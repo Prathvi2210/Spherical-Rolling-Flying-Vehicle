@@ -28,6 +28,12 @@ ros2 launch mavros apm.launch fcu_url:="tcp://127.0.0.1:5762"
 Using apm.launch is what loads ArduPilot's stream-rate config so the position topics actually publish.
 
 Terminal 4: verify working and fly from terminal
+Set the mavros message interval service:
+```bash
+ros2 service call /mavros/set_message_interval mavros_msgs/srv/MessageInterval \
+  "{message_id: 32, message_rate: 10.0}"
+```
+mavros has a service /mavros/set_message_interval for this issue.
 ```bash
 ros2 topic echo /mavros/state --once                 # connected: true
 ros2 service list | grep -E 'set_mode|arming|takeoff'  # the 3 control services
@@ -47,4 +53,12 @@ ros2 topic echo /mavros/local_position/pose --once    # pose.position.z ~ 5.0
 ros2 service call /mavros/set_mode mavros_msgs/srv/SetMode "{base_mode: 0, custom_mode: 'RTL'}"
 ```
 
-Right now stuck at 34, it is not showing anything
+Waypoint navigation
+```bash
+source install/setup.bash
+ros2 run srfv_flight guided_waypoint
+```
+To go to a custom waypoint:
+```bash
+ros2 run srfv_flight guided_waypoint --ros-args -p target_x:=10.0 -p target_y:=5.0 -p takeoff_alt:=6.0.
+```
