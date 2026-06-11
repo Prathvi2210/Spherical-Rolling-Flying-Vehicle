@@ -1,6 +1,6 @@
 Terminal 1: Gazebo (physics + world, headless)
 ```bash
-gz sim -v4 -r iris_indoor.sdf
+gz sim -v4 -r -s iris_indoor.sdf
 ```
 Changed the runway world to add indoor features and limit drift in SLAM Map
 Wait for gazebo window showing the iris quad on a runway. Leave it running.
