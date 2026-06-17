@@ -1,4 +1,23 @@
-Terminal 1: Gazebo (physics + world, headless)
+## Whole phase launch bringup file:
+Check the file name and location, file must be in srfv_ws and should be executable:
+```bash
+cp ~/Downloads/srfv_bringup.sh ~/srfv_ws/ && chmod +x ~/srfv_ws/srfv_bringup.sh
+```
+Only then run and attach:
+```bash
+~/srfv_ws/srfv_bringup.sh
+tmux attach -t srfv
+```
+How it behaves:
+It opens windows 0–7 in order with delays so the dependencies are respected — gz first (so /clock and the drone exist), then perception/SLAM/viz, then SITL (waits for gz), then mavros (waits for SITL), then teleop.
+The SITL MAVProxy console pops up as its own window as usual — set/verify params there if they didn't persist (for teleop they don't matter; velocity setpoints bypass WP-nav).
+Window 7 (teleop) is queued, not started — the command is typed and waiting. Switch to it (Ctrl-b then 7) and press Enter when you're actually watching, since it auto-arms and climbs ~7 s later. This is deliberate, so the drone doesn't take off unattended while you're still attaching.
+Tear the whole thing down with tmux kill-session -t srfv — one command kills all 8.
+Navigation inside tmux: Ctrl-b then a digit 0–7 jumps to that window; Ctrl-b w lists them. Each window shows that one process's logs, so it's the same per-component visibility you had with 8 terminals, just collected under one session.
+
+## Separate launches:
+
+# Terminal 1: Gazebo (physics + world, headless)
 ```bash
 gz sim -v4 -r -s iris_indoor.sdf
 ```
@@ -14,7 +33,7 @@ sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2 && sudo mkswap /swa
 Changed the runway world to add indoor features and limit drift in SLAM Map
 Wait for gazebo window showing the iris quad on a runway. Leave it running.
 
-Terminal 2: ROS bridge (sensors+clock)
+# Terminal 2: ROS bridge (sensors+clock)
 ```bash
 ros2 run ros_gz_bridge parameter_bridge \
   /scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked \
@@ -23,19 +42,19 @@ ros2 run ros_gz_bridge parameter_bridge \
   --ros-args -r /scan/points:=/points -r /imu:=/imu/data
 ```
 
-Terminal 3: LiDAR time-field adapter
+# Terminal 3: LiDAR time-field adapter
 ```bash
 source ~/srfv_ws/install/setup.bash
 ros2 run srfv_flight lidar_time_field
 ```
 
-Terminal 4: LIO SAM
+# Terminal 4: LIO SAM
 ```bash
 source ~/srfv_ws/install/setup.bash
 ros2 launch ~/srfv_ws/srfv_slam.launch.py
 ```
 
-Terminal 5: RViz (sim time)
+# Terminal 5: RViz (sim time)
 ```bash
 ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
 ```
@@ -49,7 +68,7 @@ Save this config as srfv.rviz, future launch commands:
 rviz2 -d ~/srfv_ws/srfv.rviz --ros-args -p use_sim_time:=true
 ```
 
-Terminal 6: ArduCopter SITL (Flight controller, connects to gazebo)
+# Terminal 6: ArduCopter SITL (Flight controller, connects to gazebo)
 ```bash
 cd ~/ardupilot/ArduCopter
 sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --console
@@ -73,7 +92,7 @@ param set WPNAV_ACCEL 100
 ```
 That's 1.5 m/s horizontal, 0.75 m/s vertical, gentle accel — LIO-SAM-friendly.
 
-Terminal 7: mavros (MAVLink-->ROS2 bridge, APM config)
+# Terminal 7: mavros (MAVLink-->ROS2 bridge, APM config)
 ```bash
 # source /opt/ros/humble/setup.bash   # only if not already in your bashrc
 pkill -f mavros          # clear any stale instance first
@@ -88,7 +107,7 @@ ros2 run srfv_flight keyboard_teleop --ros-args -p speed:=0.5 -p takeoff_alt:=1.
 ```
 OR 
 
-Terminal 8: verify working and fly from waypoint from the terminal
+# Terminal 8: verify working and fly from waypoint from the terminal
 Set the mavros message interval service:
 ```bash
 ros2 service call /mavros/set_message_interval mavros_msgs/srv/MessageInterval \
