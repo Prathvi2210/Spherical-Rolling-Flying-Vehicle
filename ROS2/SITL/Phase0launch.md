@@ -2,6 +2,15 @@ Terminal 1: Gazebo (physics + world, headless)
 ```bash
 gz sim -v4 -r -s iris_indoor.sdf
 ```
+New indoor world, trimmed for use:
+```bash
+__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia gz sim -v4 -s -r ~/ardupilot_gazebo/worlds/iris_house_trim.sdf
+```
+The prefix forces it on the GPU instead of CPU.
+Use swapfile for OOM failure protection:
+```bash
+sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2 && sudo mkswap /swapfile2 && sudo swapon /swapfile2 && swapon --show
+```
 Changed the runway world to add indoor features and limit drift in SLAM Map
 Wait for gazebo window showing the iris quad on a runway. Leave it running.
 
@@ -72,6 +81,13 @@ ros2 launch mavros apm.launch fcu_url:="tcp://127.0.0.1:5762"
 ```
 Using apm.launch is what loads ArduPilot's stream-rate config so the position topics actually publish.
 
+Terminal 8: keyboard Teleop:
+```bash
+source ~/srfv_ws/install/setup.bash
+ros2 run srfv_flight keyboard_teleop --ros-args -p speed:=0.5 -p takeoff_alt:=1.2
+```
+OR 
+
 Terminal 8: verify working and fly from waypoint from the terminal
 Set the mavros message interval service:
 ```bash
@@ -106,6 +122,11 @@ ros2 run srfv_flight guided_waypoint
 To go to a custom waypoint:
 ```bash
 ros2 run srfv_flight guided_waypoint --ros-args -p target_x:=10.0 -p target_y:=0.0 -p takeoff_alt:=2.0.
+```
+
+For RTF monitoring:
+```bash
+gz topic -e -t /world/iris_house/stats | grep --line-buffered real_time_factor
 ```
 
 
