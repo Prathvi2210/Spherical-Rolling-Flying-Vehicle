@@ -36,6 +36,13 @@ Use swapfile for OOM failure protection:
 ```bash
 sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2 && sudo mkswap /swapfile2 && sudo swapon /swapfile2 && swapon --show
 ```
+To kill any leftovers, they wont let the GUI any new world:
+```bash
+tmux kill-session -t srfv 2>/dev/null
+pkill -9 -f "gz sim"; pkill -9 -f gz-sim
+pgrep -af gz        # should come back empty
+```
+
 Changed the runway world to add indoor features and limit drift in SLAM Map
 Wait for gazebo window showing the iris quad on a runway. Leave it running.
 
