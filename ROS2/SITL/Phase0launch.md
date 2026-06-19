@@ -15,6 +15,12 @@ Window 7 (teleop) is queued, not started — the command is typed and waiting. S
 Tear the whole thing down with tmux kill-session -t srfv — one command kills all 8.
 Navigation inside tmux: Ctrl-b then a digit 0–7 jumps to that window; Ctrl-b w lists them. Each window shows that one process's logs, so it's the same per-component visibility you had with 8 terminals, just collected under one session.
 
+# save map
+Whenever ready, in a new terminal run the save_map.sh file:
+```bash
+~/srfv_ws/save_map.sh phase1
+```
+
 ## Separate launches:
 
 # Terminal 1: Gazebo (physics + world, headless)
