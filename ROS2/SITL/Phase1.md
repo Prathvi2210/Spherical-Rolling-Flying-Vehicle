@@ -12,3 +12,11 @@ ros2 run srfv_flight global_planner_astar --ros-args \
 ```
 RViz, Fixed Frame map: add PointCloud2 /srfv/global/occupied (the map), Path /srfv/global/path, 
 MarkerArray /srfv/global/endpoints. Click 2D Goal Pose and pick a spot — a path should appear and the log prints waypoint count, length, and solve time.
+
+Dynamic-live planner deployment:
+```bash
+ros2 run srfv_flight global_planner_astar --ros-args \
+  -p live_map:=true \
+  -p resolution:=0.15 -p inflation_radius:=0.3 \
+  -p start:="[0.0, 0.0, 1.0]"
+```
