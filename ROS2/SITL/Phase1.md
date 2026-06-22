@@ -28,3 +28,7 @@ ros2 run srfv_flight global_planner_astar --ros-args \
   -p live_map:=true \
   -p resolution:=0.15 -p inflation_radius:=0.3
 ```
+Launch the waypoint sequencer- to make the drone follow the given path by path planner:
+```bash
+ros2 run srfv_flight waypoint_sequencer
+```
