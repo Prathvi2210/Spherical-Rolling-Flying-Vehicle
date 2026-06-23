@@ -20,6 +20,13 @@ Whenever ready, in a new terminal run the save_map.sh file:
 ```bash
 ~/srfv_ws/save_map.sh phase1
 ```
+# Build:
+For any changes in the launch files:
+```bash
+cd ~/srfv_ws
+colcon build
+source install/setup.bash
+```
 
 ## Separate launches:
 
