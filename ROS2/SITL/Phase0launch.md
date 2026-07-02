@@ -75,9 +75,6 @@ ros2 launch ~/srfv_ws/srfv_slam.launch.py
 ```
 
 # Terminal 5: RViz (sim time)
-```bash
-ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
-```
 RViz setup: Fixed Frame = map
 Add PointCloud2 → /lio_sam/mapping/map_global — Reliability Reliable, Size 0.05 (the growing map)
 Add PointCloud2 → /lio_sam/mapping/cloud_registered_raw — Reliability Reliable (live scan — best for watching it fly)
@@ -86,6 +83,11 @@ Add Odometry → /lio_sam/mapping/odometry — Reliability Best Effort
 Save this config as srfv.rviz, future launch commands:
 ```bash
 rviz2 -d ~/srfv_ws/srfv.rviz --ros-args -p use_sim_time:=true
+```
+For normal rviz launch :
+```bash
+```bash
+ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
 ```
 
 # Terminal 6: ArduCopter SITL (Flight controller, connects to gazebo)
@@ -120,14 +122,23 @@ ros2 launch mavros apm.launch fcu_url:="tcp://127.0.0.1:5762"
 ```
 Using apm.launch is what loads ArduPilot's stream-rate config so the position topics actually publish.
 
-Terminal 8: keyboard Teleop:
+After mavros connectsand the FCU has GPS, set the stream rate and verify pose:
+```bash
+ros2 service call /mavros/set_stream_rate mavros_msgs/srv/StreamRate "{stream_id: 0, message_rate: 50, on_off: true}"
+```
+z drift increases too much and becomes unstable at 200Hz.
+Verify the pose is actually publishing- must use best_effort(currently mavros barometer reading i.e z is 0.189 m offset, can be adjusted later):
+```bash
+ros2 topic echo /mavros/local_position/pose --field pose.position --once --qos-reliability best_effort
+```
+# Terminal 8: keyboard Teleop:
 ```bash
 source ~/srfv_ws/install/setup.bash
 ros2 run srfv_flight keyboard_teleop --ros-args -p speed:=0.5 -p takeoff_alt:=1.2
 ```
 OR 
 
-# Terminal 8: verify working and fly from waypoint from the terminal
+Terminal 8: verify working and fly from waypoint from the terminal
 Set the mavros message interval service:
 ```bash
 ros2 service call /mavros/set_message_interval mavros_msgs/srv/MessageInterval \
