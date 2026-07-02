@@ -79,6 +79,8 @@ class WaypointSequencer(Node):
         self.declare_parameter("target_altitude", -1.0)     # <0 => hold current mavros z
         self.declare_parameter("yaw_offset_deg", float("nan"))
         self.declare_parameter("ignore_replans", True)      # don't restart on every replan
+        self.declare_parameter("hold_ticks", 20)            # how many ticks to latch final hold
+        self.declare_parameter("new_goal_tol", 0.5)         # goal must move > this (m) to count as NEW
 
         g = self.get_parameter
         self.accept_radius = g("accept_radius").value
@@ -86,6 +88,8 @@ class WaypointSequencer(Node):
         self.target_alt_param = g("target_altitude").value
         self.yaw_override = g("yaw_offset_deg").value
         self.ignore_replans = g("ignore_replans").value
+        self.hold_ticks = int(g("hold_ticks").value)
+        self.new_goal_tol = g("new_goal_tol").value
         rate = g("publish_rate_hz").value
 
         # live state
@@ -109,8 +113,10 @@ class WaypointSequencer(Node):
         self.waypoints = []        # ArduPilot ENU (x, y, z)
         self.idx = 0
         self.finished = False
+        self.hold_left = 0
         self.target_alt = None
         self.have_active_path = False
+        self.cur_goal = None       # ArduPilot ENU (x, y) of the goal we're following
 
         self._log_throttle = self.get_clock().now()
         self._warn_throttle = self.get_clock().now()
@@ -193,11 +199,24 @@ class WaypointSequencer(Node):
         if not self.have_pose:
             self.get_logger().warn("No mavros pose yet; cannot follow path.")
             return
-        # Ignore replans once we're already following (avoids restart thrash).
-        if self.ignore_replans and self.have_active_path and not self.finished:
-            return
         if not self.calibrated and not self._freeze_calibration():
             return
+
+        # Transform the incoming goal (final waypoint) into ArduPilot ENU so we can
+        # compare it against the goal we're currently following.
+        gx_map, gy_map = msg.poses[-1].pose.position.x, msg.poses[-1].pose.position.y
+        new_goal = self._map_to_ardu(gx_map, gy_map)
+
+        # Decide whether this path is a NEW goal or just a replan of the current one.
+        if self.ignore_replans and self.have_active_path and self.cur_goal is not None:
+            moved = math.hypot(new_goal[0] - self.cur_goal[0],
+                               new_goal[1] - self.cur_goal[1])
+            if moved <= self.new_goal_tol:
+                # Same goal, replanned -- ignore (prevents post-arrival loop).
+                return
+            # else: goal has moved -> fall through and accept as a new mission.
+            self.get_logger().info(
+                f"New GOAL detected (moved {moved:.2f} m). Re-engaging.")
 
         if self.target_alt is None:
             self.target_alt = (self.cur[2] if self.target_alt_param < 0.0
@@ -208,7 +227,9 @@ class WaypointSequencer(Node):
         self.waypoints = [(ax, ay, self.target_alt) for (ax, ay) in wps]
         self.idx = 0
         self.finished = False
+        self.hold_left = 0
         self.have_active_path = True
+        self.cur_goal = new_goal
 
         self.get_logger().info(
             f"New path: {len(self.waypoints)} waypoints (ArduPilot ENU, "
@@ -219,7 +240,19 @@ class WaypointSequencer(Node):
 
     # control loop: publish the CURRENT waypoint as a position target; advance on arrival
     def _control_loop(self):
-        if not self.have_pose or not self.waypoints or self.finished:
+        if not self.have_pose or not self.waypoints:
+            return
+
+        # Finished: re-send the final hold target a bounded number of times so
+        # ArduCopter latches it, then stop publishing entirely (release the stream).
+        if self.finished:
+            if self.hold_left > 0:
+                fx, fy, fz = self.waypoints[-1]
+                self._send_position(fx, fy, fz)
+                self.hold_left -= 1
+                if self.hold_left == 0:
+                    self.get_logger().info(
+                        "Hold target latched -- stream released. Mission complete.")
             return
 
         if self.require_guided:
@@ -238,9 +271,9 @@ class WaypointSequencer(Node):
         if d2 < self.accept_radius:
             if self.idx >= len(self.waypoints) - 1:
                 self.finished = True
+                self.hold_left = self.hold_ticks
                 self.get_logger().info(
-                    "Final waypoint reached. Holding (last position target latched).")
-                # Leave the final target latched; ArduCopter loiters there.
+                    "Final waypoint reached. Sending hold target, then releasing stream.")
                 self._send_position(wx, wy, wz)
                 return
             self.idx += 1
